@@ -9,10 +9,25 @@
 <body>
 
 <div id="echart-main" style="height: 600px; width: 800px"></div>
-
+<br />
+<div>
+    <table>
+        <tr>
+            <th>source</th>
+            <th>target</th>
+            <th>confidence</th>
+        </tr>
+        <tr th:each="FI:${FIList}">
+            <td th:text="${FI.getSource()}"></td>
+            <td th:text="${FI.getTarget()}"></td>
+            <td th:text="${FI.getConfidence()}"></td>
+        </tr>
+    </table>
+</div>
 <script>
 
     var myChart = echarts.init(document.getElementById('echart-main'));
+
     var city={
         '北京':'#c23531',
         '上海':'#2f4554',
@@ -20,6 +35,7 @@
         '深圳':'#d48265',
         '香港':'#749f83'
     }
+
     var population=[
         {source: "广州", target: "北京", value: 4567},
         {source: "广州", target: "上海", value: 2060},
@@ -27,8 +43,21 @@
         {source: "深圳", target: "上海", value: 124},
         {source: "香港", target: "北京", value: 3714},
         {source: "香港", target: "上海", value: 3234}];
-    var data=[];
+    var chartData=[];
     var citylist=[];
+
+    $.ajax({
+        url: "/data/filist",
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+           for (let itemSet in data) {
+               data.push(itemSet.source)
+           }
+
+        }
+
+    })
     for(var key in city){
         citylist.push(
             {name: key,itemStyle: {color:city[key]}}
