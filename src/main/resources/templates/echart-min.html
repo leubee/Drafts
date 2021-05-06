@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.6.0/echarts.min.js"></script>
+    <title>Title</title>
+</head>
+<body>
+
+<div id="echart-main" style="height: 600px; width: 800px"></div>
+
+<script>
+
+    var myChart = echarts.init(document.getElementById('echart-main'));
+    var city={
+        '北京':'#c23531',
+        '上海':'#2f4554',
+        '广州':'#61a0a8',
+        '深圳':'#d48265',
+        '香港':'#749f83'
+    }
+    var population=[
+        {source: "广州", target: "北京", value: 4567},
+        {source: "广州", target: "上海", value: 2060},
+        {source: "深圳", target: "北京", value: 1234},
+        {source: "深圳", target: "上海", value: 124},
+        {source: "香港", target: "北京", value: 3714},
+        {source: "香港", target: "上海", value: 3234}];
+    var data=[];
+    var citylist=[];
+    for(var key in city){
+        citylist.push(
+            {name: key,itemStyle: {color:city[key]}}
+        )
+    }
+    for(var i=0;i<population.length;i++){
+        var color=new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                offset: 0,
+                color: city[population[i].source]
+            },{
+                offset: 1,
+                color: city[population[i].target]
+            }]
+        )
+        data.push(
+            {source: population[i].source,
+                target: population[i].target,
+                value: population[i].value,
+                lineStyle: {
+                    color:color
+                }
+            }
+        )
+    }
+    option = {
+        title: {
+            text: '桑基图之城市移民人口统计',
+            subtext: 'powered by echart',
+            left: '5%',
+        },
+        tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+        },
+        series: [
+            {
+                type: 'sankey',
+                top: 50,
+                data: citylist,
+                links: data,
+                focusNodeAdjacency: 'allEdges',
+                itemStyle: {
+                    borderWidth: 1,
+                    color:'#1b6199',
+                    borderColor: '#fff'
+                },
+                lineStyle: {
+                    curveness: 0.5,
+                    opacity:0.5
+                }
+            }
+        ]
+    }
+    myChart.setOption(option);
+
+
+</script>
+
+</body>
+</html>
