@@ -28,91 +28,102 @@
 
     var myChart = echarts.init(document.getElementById('echart-main'));
 
-    var city={
-        '北京':'#c23531',
-        '上海':'#2f4554',
-        '广州':'#61a0a8',
-        '深圳':'#d48265',
-        '香港':'#749f83'
+    function renderColor() {
+        var r = Math.round(Math.random() * 255).toString(16);
+        var g = Math.round(Math.random() * 255).toString(16);
+        var b = Math.round(Math.random() * 255).toString(16);
+        return ;
     }
 
-    var population=[
-        {source: "广州", target: "北京", value: 4567},
-        {source: "广州", target: "上海", value: 2060},
-        {source: "深圳", target: "北京", value: 1234},
-        {source: "深圳", target: "上海", value: 124},
-        {source: "香港", target: "北京", value: 3714},
-        {source: "香港", target: "上海", value: 3234}];
+    var itemSets={};
+    var FrequentModels=[];
+
+    var itemSetList=[];
     var chartData=[];
-    var citylist=[];
 
     $.ajax({
         url: "/data/filist",
         type: "GET",
         dataType: "json",
         success: function (data) {
-           for (let itemSet in data) {
-               data.push(itemSet.source)
+           for (var i in data) {
+               FrequentModels.push(data[i])
+               console.log(renderColor());
+               if (itemSets[data[i].source] == null) {
+                   itemSets[data[i].source] = "#ff00ff";
+               }
+               if (itemSets[data[i].target] == null) {
+                   itemSets[data[i].target] = "#00ff00";
+               }
            }
+           renderChart();
+        }
+    })
 
+    function renderChart() {
+
+        for (var s in itemSets) {
+            itemSetList.push(
+                {
+                    name: s,
+                    itemStyle: {
+                        color: itemSets[s],
+                    }
+                }
+            )
         }
 
-    })
-    for(var key in city){
-        citylist.push(
-            {name: key,itemStyle: {color:city[key]}}
-        )
-    }
-    for(var i=0;i<population.length;i++){
-        var color=new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                offset: 0,
-                color: city[population[i].source]
-            },{
-                offset: 1,
-                color: city[population[i].target]
-            }]
-        )
-        data.push(
-            {source: population[i].source,
-                target: population[i].target,
-                value: population[i].value,
-                lineStyle: {
-                    color:color
+        for (var i = 0; i < FrequentModels.length; i++) {
+            var linkcolor = new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                    offset: 0,
+                    color: itemSets[FrequentModels[i].source]
+                }, {
+                    offset: 1,
+                    color: itemSets[FrequentModels[i].target]
+                }]
+            )
+            chartData.push(
+                {
+                    source: FrequentModels[i].source,
+                    target: FrequentModels[i].target,
+                    value: FrequentModels[i].confidence,
+                    lineStyle: {
+                        color: linkcolor
+                    }
                 }
-            }
-        )
-    }
-    option = {
-        title: {
-            text: '桑基图之城市移民人口统计',
-            subtext: 'powered by echart',
-            left: '5%',
-        },
-        tooltip: {
-            trigger: 'item',
-            triggerOn: 'mousemove'
-        },
-        series: [
-            {
-                type: 'sankey',
-                top: 50,
-                data: citylist,
-                links: data,
-                focusNodeAdjacency: 'allEdges',
-                itemStyle: {
-                    borderWidth: 1,
-                    color:'#1b6199',
-                    borderColor: '#fff'
-                },
-                lineStyle: {
-                    curveness: 0.5,
-                    opacity:0.5
+            )
+        }
+        option = {
+            title: {
+                text: '桑基图之城市移民人口统计',
+                subtext: 'powered by echart',
+                left: '5%',
+            },
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'mousemove'
+            },
+            series: [
+                {
+                    type: 'sankey',
+                    top: 50,
+                    data: itemSetList,
+                    links: chartData,
+                    focusNodeAdjacency: 'allEdges',
+                    itemStyle: {
+                        borderWidth: 1,
+                        color: '#1b6199',
+                        borderColor: '#fff'
+                    },
+                    lineStyle: {
+                        curveness: 0.5,
+                        opacity: 0.5
+                    }
                 }
-            }
-        ]
+            ]
+        }
+        myChart.setOption(option);
     }
-    myChart.setOption(option);
-
 
 </script>
 
