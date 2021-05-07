@@ -3,7 +3,7 @@ package com.lbh.visualdemo.service;
 import lombok.Data;
 
 @Data
-public class FrequentItemsetDTO {
+public class FrequentModelDTO {
 
     private String source;
 
